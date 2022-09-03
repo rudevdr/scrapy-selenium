@@ -14,7 +14,7 @@ class SeleniumMiddleware:
     """Scrapy middleware handling the requests using selenium"""
 
     def __init__(self, driver_name, driver_executable_path, command_executor,
-                 driver_arguments, browser_executable_path):
+                 driver_arguments, browser_executable_path, driver_undetected):
 
         """Initialize the selenium webdriver
 
@@ -44,6 +44,10 @@ class SeleniumMiddleware:
         for argument in driver_arguments:
             driver_options.add_argument(argument)
 
+        if driver_undetected:
+            import undetected_chromedriver as uc
+
+            self.driver = uc.Chrome(version_main=103, options=driver_options)
         # locally installed driver
         if driver_executable_path is not None:
             driver_kwargs = {
@@ -64,6 +68,7 @@ class SeleniumMiddleware:
 
         driver_name = crawler.settings.get('SELENIUM_DRIVER_NAME')
         driver_executable_path = crawler.settings.get('SELENIUM_DRIVER_EXECUTABLE_PATH')
+        driver_undetected = crawler.settings.get('SELENIUM_UNDETECTED')
         browser_executable_path = crawler.settings.get('SELENIUM_BROWSER_EXECUTABLE_PATH')
         command_executor = crawler.settings.get('SELENIUM_COMMAND_EXECUTOR')
         driver_arguments = crawler.settings.get('SELENIUM_DRIVER_ARGUMENTS')
@@ -80,7 +85,8 @@ class SeleniumMiddleware:
             driver_executable_path=driver_executable_path,
             browser_executable_path=browser_executable_path,
             command_executor=command_executor,
-            driver_arguments=driver_arguments
+            driver_arguments=driver_arguments,
+            driver_undetected=driver_undetected
         )
 
         crawler.signals.connect(middleware.spider_closed, signals.spider_closed)

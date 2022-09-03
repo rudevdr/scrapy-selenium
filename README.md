@@ -23,15 +23,17 @@ You will also need one of the Selenium [compatible browsers](http://www.selenium
     SELENIUM_DRIVER_NAME = 'firefox'
     SELENIUM_DRIVER_EXECUTABLE_PATH = which('geckodriver')
     SELENIUM_DRIVER_ARGUMENTS=['-headless']  # '--headless' if using chrome instead of firefox
-    SELENIUM_REMOTE_URL = 'http://localhost:4444/wd/hub' # Selenium grid url.
     ```
-
-    **Note:** If the grid url is configured, it will be used first.
 
     Optionally, set the path to the browser executable:
 
     ```python
     SELENIUM_BROWSER_EXECUTABLE_PATH = which('firefox')
+    ```
+
+In order to use a remote Selenium driver, specify `SELENIUM_COMMAND_EXECUTOR` instead of `SELENIUM_DRIVER_EXECUTABLE_PATH`:
+    ```python
+    SELENIUM_COMMAND_EXECUTOR = 'http://localhost:4444/wd/hub'
     ```
 
 2. Add the `SeleniumMiddleware` to the downloader middlewares:
@@ -49,7 +51,7 @@ Use the `scrapy_selenium.SeleniumRequest` instead of the scrapy built-in `Reques
 ```python
 from scrapy_selenium import SeleniumRequest
 
-yield SeleniumRequest(url, self.parse_result)
+yield SeleniumRequest(url=url, callback=self.parse_result)
 ```
 
 The request will be handled by selenium, and the request will have an additional `meta` key, named `driver` containing the selenium driver with the request processed.
@@ -110,8 +112,8 @@ When used, selenium will execute custom JavaScript code.
 
 ```python
 yield SeleniumRequest(
-    url,
-    self.parse_result,
+    url=url,
+    callback=self.parse_result,
     script='window.scrollTo(0, document.body.scrollHeight);',
 )
 ```
